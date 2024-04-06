@@ -1,22 +1,46 @@
-from PyQt5.QtCore import Qt, QUrl, QSize, QRect
+from PyQt5.QtCore import Qt, QUrl, QSize
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtWidgets import QWidget, QLabel, QSizePolicy, QSpacerItem, QHBoxLayout, QVBoxLayout
 
-from qfluentwidgets import (SettingCardGroup, SettingCard, CustomColorSettingCard,
-                            PrimaryPushSettingCard, OptionsSettingCard, HyperlinkLabel,
-                            ComboBoxSettingCard, SwitchSettingCard, SimpleCardWidget,
-                            ExpandLayout, ScrollArea, InfoBar, FluentIcon, AvatarWidget,
-                            BodyLabel, StrongBodyLabel, setTheme, setThemeColor)
+from qfluentwidgets import (
+    SettingCardGroup,
+    SettingCard,
+    CustomColorSettingCard,
+    PrimaryPushSettingCard,
+    OptionsSettingCard,
+    HyperlinkLabel,
+    ComboBoxSettingCard,
+    SwitchSettingCard,
+    SimpleCardWidget,
+    ExpandLayout,
+    ScrollArea,
+    InfoBar,
+    FluentIcon,
+    AvatarWidget,
+    BodyLabel,
+    StrongBodyLabel,
+    setTheme,
+    setThemeColor,
+)
 
 from ...common.config import cfg, isWin11
-from ...common.tool import StyleSheet, signalBus, VERSION, YEAR, SCSHUB_FEEDBACK_URL, GITHUB, TELEGRAM, INSTAGRAM
+from ...common.tool import (
+    StyleSheet,
+    signalBus,
+    VERSION,
+    YEAR,
+    SCSHUB_FEEDBACK_URL,
+    GITHUB,
+    TELEGRAM,
+    INSTAGRAM,
+)
 
 
 class SettingInterface(ScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent=parent)
-        
+
         self.scrollWidget = QWidget()
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
@@ -31,65 +55,65 @@ class SettingInterface(ScrollArea):
     def cards(self):
 
         self.personalGroup = SettingCardGroup(self.tr("Personalization"), self.scrollWidget)
-        
+
         self.micaCard = SwitchSettingCard(
             FluentIcon.TRANSPARENT,
             self.tr("Mica effect"),
             self.tr("Apply semi transparent to windows and surfaces"),
             cfg.micaEnabled,
-            self.personalGroup
+            self.personalGroup,
         )
         self.themeCard = OptionsSettingCard(
             cfg.themeMode,
             FluentIcon.BRUSH,
             self.tr("Application theme"),
             self.tr("Change the appearance of your application"),
-            texts=[
-                self.tr("Light"), self.tr("Dark"),
-                self.tr("Use system setting")
-            ],
-            parent=self.personalGroup
+            texts=[self.tr("Light"), self.tr("Dark"), self.tr("Use system setting")],
+            parent=self.personalGroup,
         )
         self.themeColorCard = CustomColorSettingCard(
             cfg.themeColor,
             FluentIcon.PALETTE,
             self.tr("Theme color"),
             self.tr("Change the theme color of you application"),
-            self.personalGroup
+            self.personalGroup,
         )
         self.zoomCard = ComboBoxSettingCard(
             cfg.dpiScale,
             FluentIcon.ZOOM,
             self.tr("Interface zoom"),
             self.tr("Change the size of widgets and fonts"),
-            texts=[
-                "100%", "125%", "150%", "175%", "200%",
-                self.tr("Use system setting")],
-            parent=self.personalGroup
+            texts=["100%", "125%", "150%", "175%", "200%", self.tr("Use system setting")],
+            parent=self.personalGroup,
         )
         self.languageCard = ComboBoxSettingCard(
             cfg.language,
             FluentIcon.LANGUAGE,
             self.tr("Language"),
             self.tr("Set your preferred language for UI"),
-            texts=['English', self.tr('Use system setting')],
-            parent=self.personalGroup
+            texts=["English", self.tr("Use system setting")],
+            parent=self.personalGroup,
         )
 
         self.aboutGroup = SettingCardGroup(self.tr("About"), self.scrollWidget)
-        
+
         self.feedbackCard = PrimaryPushSettingCard(
             self.tr("Provide feedback"),
             FluentIcon.FEEDBACK,
             self.tr("Provide feedback"),
             self.tr("Help us improve SCS Hub by providing feedback"),
-            self.aboutGroup
+            self.aboutGroup,
         )
         self.aboutCard = SettingCard(
             FluentIcon.INFO,
             self.tr("About"),
-            "© " + self.tr("Copyright") + f" {YEAR}, AmirMahdavi. " + self.tr("Version") + " " + VERSION,
-            self.aboutGroup
+            "© "
+            + self.tr("Copyright")
+            + f" {YEAR}, AmirMahdavi. "
+            + self.tr("Version")
+            + " "
+            + VERSION,
+            self.aboutGroup,
         )
 
     def profile(self):
@@ -114,7 +138,7 @@ class SettingInterface(ScrollArea):
         self.textLayout.setObjectName("textLayout")
 
         spacerItem1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        
+
         self.nameLabel = StrongBodyLabel(self.profileCard)
         self.nameLabel.setObjectName("nameLabel")
         self.nameLabel.setText("Amir Mahdavi")
@@ -126,7 +150,7 @@ class SettingInterface(ScrollArea):
         self.linkLayout = QHBoxLayout()
         self.linkLayout.setObjectName("linkLayout")
         self.linkLayout.setSpacing(16)
-        
+
         self.githubLink = HyperlinkLabel("GitHub", self.profileCard)
         self.githubLink.setObjectName("githubLink")
         self.githubLink.setUrl(GITHUB)
@@ -135,7 +159,7 @@ class SettingInterface(ScrollArea):
         self.telegramLink.setObjectName("telegramLink")
         self.telegramLink.setUrl(TELEGRAM)
 
-        self.instagramLink = HyperlinkLabel("Instagram",self.profileCard)
+        self.instagramLink = HyperlinkLabel("Instagram", self.profileCard)
         self.instagramLink.setObjectName("instagramLink")
         self.instagramLink.setUrl(INSTAGRAM)
 
@@ -197,7 +221,7 @@ class SettingInterface(ScrollArea):
             self.tr("Success"),
             self.tr("Configuration takes effect after restart"),
             duration=1500,
-            parent=self
+            parent=self,
         )
 
     def connectSignalToSlot(self):
@@ -212,4 +236,5 @@ class SettingInterface(ScrollArea):
 
         # about
         self.feedbackCard.clicked.connect(
-            lambda: QDesktopServices.openUrl(QUrl(SCSHUB_FEEDBACK_URL)))
+            lambda: QDesktopServices.openUrl(QUrl(SCSHUB_FEEDBACK_URL))
+        )

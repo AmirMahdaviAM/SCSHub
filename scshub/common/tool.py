@@ -23,8 +23,6 @@ SCSHUB_GITHUB_URL = "https://github.com/AmirMahdaviAM/SCSHub/"
 SCSHUB_FEEDBACK_URL = "https://github.com/AmirMahdaviAM/SCSHub/issues"
 SCSHUB_FORUM_URL = "https://forum.scssoft.com"
 FORUM_URL = "https://forum.scssoft.com"
-CONVERTERPIX_GITHUB_URL = "https://forum.scssoft.com"
-
 
 # set tools path
 TOOLS_PATH = os.path.join(os.getcwd(), "tools")
@@ -59,6 +57,7 @@ class ScsHubIcon(FluentIconBase, Enum):
     SCS_EXTRACTOR_FILL = "interface/scs_extractor_fill"
 
     SCS = "scs"
+
     FILE = "file"
     FOLDER = "folder"
     ANIM = "anim"
