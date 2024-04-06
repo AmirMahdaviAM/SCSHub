@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QBrush, QPainterPath, QLinearGradient
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel
 
 from qfluentwidgets import ScrollArea, FluentIcon, isDarkTheme
 
@@ -37,31 +37,7 @@ class BannerWidget(QWidget):
         )
         self.linkCardView.addCard(
             FluentIcon.GITHUB,
-            self.tr("GitHub repo"),
-            self.tr("Repository with source code and details"),
-            SCSHUB_GITHUB_URL,
-        )
-        self.linkCardView.addCard(
-            ScsHubIcon.SCS,
-            self.tr("SCS Forum"),
-            self.tr("Forum topic and all information about SCS Hub"),
-            SCSHUB_FORUM_URL,
-        )
-        self.linkCardView.addCard(
-            FluentIcon.GITHUB,
-            self.tr("GitHub repo"),
-            self.tr("Repository with source code and details"),
-            SCSHUB_GITHUB_URL,
-        )
-        self.linkCardView.addCard(
-            ScsHubIcon.SCS,
-            self.tr("SCS Forum"),
-            self.tr("Forum topic and all information about SCS Hub"),
-            SCSHUB_FORUM_URL,
-        )
-        self.linkCardView.addCard(
-            FluentIcon.GITHUB,
-            self.tr("GitHub repo"),
+            self.tr("GitHub Repo"),
             self.tr("Repository with source code and details"),
             SCSHUB_GITHUB_URL,
         )
@@ -114,34 +90,32 @@ class HomeInterface(ScrollArea):
         self.setWidgetResizable(True)
 
         self.banner = BannerWidget(self)
-        # self.mame = CreditWidget(self)
 
         self.vBoxLayout = QVBoxLayout(self.view)
-        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)  # left, top, right, down
+        self.vBoxLayout.setContentsMargins(0, 0, 0, 0)
         self.vBoxLayout.setSpacing(40)
         self.vBoxLayout.addWidget(self.banner)
-        # self.vBoxLayout.addWidget(self.mame)
 
         StyleSheet.HOME_INTERFACE.apply(self)
 
         appsView = InterfaceCardView(self.tr("Apps"), self.view)
 
         appsView.addSampleCard(
-            FluentIcon.DEVELOPER_TOOLS,
-            "Converter PIX",
+            ScsHubIcon.PIX_CONVERTER,
+            self.tr("Converter PIX"),
             self.tr("Extractor and converter (*.PMX to *.PIX)"),
             "pixInterface",
         )
         appsView.addSampleCard(
-            FluentIcon.IMAGE_EXPORT,
-            "SCS Extractor",
-            self.tr("Extract whole *.scs archive file without any change"),
+            ScsHubIcon.SCS_EXTRACTOR,
+            self.tr("SCS Extractor"),
+            self.tr("Extract whole *.scs archive file without conversion"),
             "scsInterface",
         )
         appsView.addSampleCard(
             FluentIcon.SETTING,
-            "Setting",
-            self.tr("A place to configure app and change theme"),
+            self.tr("Settings"),
+            self.tr("Place to configure and personlize app"),
             "settingInterface",
         )
 

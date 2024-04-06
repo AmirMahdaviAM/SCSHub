@@ -7,9 +7,19 @@ from enum import Enum
 from PyQt5.QtCore import Qt, QProcess
 from PyQt5.QtWidgets import QWidget, QFileDialog, QListWidgetItem
 
-from qfluentwidgets import (InfoBar, InfoBarPosition, InfoBarIcon, IndeterminateProgressRing,
-                            PushButton, ToolTipFilter, FluentIcon, InfoLevel, FluentIconBase,
-                            ListWidget, InfoBadge)
+from qfluentwidgets import (
+    InfoBar,
+    InfoBarPosition,
+    InfoBarIcon,
+    IndeterminateProgressRing,
+    PushButton,
+    ToolTipFilter,
+    FluentIcon,
+    InfoLevel,
+    FluentIconBase,
+    ListWidget,
+    InfoBadge,
+)
 
 from scshub.view.ui.pix_ui import Ui_PIX
 from scshub.common.tool import ScsHubIcon, downloader, PIX_URL, PIX_PATH
@@ -38,7 +48,7 @@ class PixInterface(QWidget, Ui_PIX):
     def __init__(self):
         super().__init__()
 
-        #check for log file and delete it
+        # check for log file and delete it
         if os.path.isfile("pix.log"):
             os.remove("pix.log")
             logger.info("Delete last pix.log file")
@@ -48,7 +58,7 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.PIX_MODE = ""
         self.MODE = "-extract_f"
-        
+
         self.SUB_PATH = "/"
         self.ANIM_PATH = "/"
         self.SUFFIX_END = ""
@@ -99,13 +109,13 @@ class PixInterface(QWidget, Ui_PIX):
         self.tobjRadio.installEventFilter(ToolTipFilter(self.tobjRadio))
         self.extdirRadio.installEventFilter(ToolTipFilter(self.extdirRadio))
         self.extfileRadio.installEventFilter(ToolTipFilter(self.extfileRadio))
-        
+
         self.materialCheckbox.stateChanged.connect(lambda: self.materialOption())
         self.materialCheckbox.installEventFilter(ToolTipFilter(self.materialCheckbox))
 
         self.animCheckBox.stateChanged.connect(lambda: self.animOption())
         self.animCheckBox.installEventFilter(ToolTipFilter(self.animCheckBox))
-        
+
         self.animListCard.hide()
         self.animList.setSelectionMode(ListWidget.MultiSelection)
         self.animList.currentTextChanged.connect(self.indexAnimFolder)
@@ -138,7 +148,6 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.runButton.clicked.connect(lambda: self.customMode())
 
-
     def listdirMode(self):
         """Run ConverterPIX to create directory and file lists"""
 
@@ -149,7 +158,7 @@ class PixInterface(QWidget, Ui_PIX):
         args = ""
         for file_path in self.SCS_FILES:
             args += f'{Argument.BASE} "{file_path}" '
-        args += f'{Argument.LISTDIR} {self.SUB_PATH}'
+        args += f"{Argument.LISTDIR} {self.SUB_PATH}"
 
         logger.info(f"Change process to listdir mode with these argument: ({args})")
 
@@ -167,23 +176,25 @@ class PixInterface(QWidget, Ui_PIX):
             args += f'{Argument.BASE} "{file_path}" '
 
         if self.MATERIAL147 and self.materialCheckbox.isEnabled():
-            args += f'{Argument.NEW_MAT} '
-        args += f'{self.MODE} '
+            args += f"{Argument.NEW_MAT} "
+        args += f"{self.MODE} "
 
         if self.MODE == "-m":
-            args += f'{self.SUB_PATH[:-4]} '
+            args += f"{self.SUB_PATH[:-4]} "
         else:
-            args += f'{self.SUB_PATH} '
+            args += f"{self.SUB_PATH} "
 
         if self.ANIMMODE and self.animCheckBox.isEnabled() and self.SELECTED_ANIM_FILES != []:
             for file in self.SELECTED_ANIM_FILES:
-                anim = os.path.join(self.SUB_PATH.replace(self.LAST_SELECTED_FILE, ""), file[:-4]).replace("\\", "/")
-                args += f'{anim} '
+                anim = os.path.join(
+                    self.SUB_PATH.replace(self.LAST_SELECTED_FILE, ""), file[:-4]
+                ).replace("\\", "/")
+                args += f"{anim} "
 
         args += f'{Argument.EXP} "{self.EXPORT_PATH}"'
 
         logger.info(f"Change process to custom mode with these argument: ({args})")
-        
+
         # run converter pix
         self.pixMainProcess(args)
 
@@ -194,13 +205,12 @@ class PixInterface(QWidget, Ui_PIX):
         args = ""
         for file_path in self.SCS_FILES:
             args += f'{Argument.BASE} "{file_path}" '
-        args += f'{Argument.LISTDIR} {self.ANIM_PATH}'
+        args += f"{Argument.LISTDIR} {self.ANIM_PATH}"
 
         logger.info(f"Change process to anim mode with these argument: ({args})")
 
         # run converter pix
         self.pixAnimProcess(args)
-
 
     def selectMode(self, mode):
         """Change argument with selected modes"""
@@ -251,7 +261,7 @@ class PixInterface(QWidget, Ui_PIX):
             self.MATERIAL147 = True
         else:
             self.MATERIAL147 = False
-        
+
         logger.info(f"Change past 1.47 material option state to {self.MATERIAL147}")
 
     def animOption(self):
@@ -263,13 +273,12 @@ class PixInterface(QWidget, Ui_PIX):
         else:
             self.ANIMMODE = False
             self.animListCard.hide()
-        
-        logger.info(f"Enable anim state to {self.ANIMMODE}") 
 
+        logger.info(f"Enable anim state to {self.ANIMMODE}")
 
     def pixMainProcess(self, args):
         """Main process to run Convertex PIX exe file (Main)"""
-        
+
         # check if scs path is not empty
         if self.SCS_FILES == "":
             logger.error("SCS file path is not set and operation canceled")
@@ -289,7 +298,7 @@ class PixInterface(QWidget, Ui_PIX):
 
     def handleMainOutput(self):
         """Handle output of ConverterPIX (Main)"""
-    
+
         # get output data from process and decode it
         data = self.mainProcess.readAllStandardOutput()
         decoded = bytes(data).decode("utf-8")
@@ -298,7 +307,7 @@ class PixInterface(QWidget, Ui_PIX):
 
         # handle listdir mode
         if self.PIX_MODE == "listdir":
-            
+
             if output[-1] == "-- done --":
                 # add root item to navigation bar
                 if len(self.SCS_FILES) < 2:
@@ -322,7 +331,9 @@ class PixInterface(QWidget, Ui_PIX):
                     # create file list
                     elif line.startswith("[F] "):
                         # cheack suffix and only include specified in list26
-                        if line.endswith(self.SUFFIX_END) and not line.endswith((".pmg", ".pmc", ".pma")):
+                        if line.endswith(self.SUFFIX_END) and not line.endswith(
+                            (".pmg", ".pmc", ".pma")
+                        ):
                             file.append(os.path.relpath(line[4:], self.SUB_PATH))
 
                 # set list count to badges
@@ -331,28 +342,42 @@ class PixInterface(QWidget, Ui_PIX):
 
                 # add items in list to list view
                 for dir in folder:
-                    self.folderList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.FOLDER), dir))
-                
+                    self.folderList.addItem(
+                        QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.FOLDER), dir)
+                    )
+
                 # add items in list to list view and ignore it if in (-extract_d) mode
                 if self.MODE != str(Argument.EXT_DIR):
                     for file in file:
                         if file.endswith(".pmd"):
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.MODEL), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.MODEL), file)
+                            )
 
                         elif file.endswith(".ppd"):
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.PREFAB), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.PREFAB), file)
+                            )
 
                         elif file.endswith(".tobj"):
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TOBJ), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TOBJ), file)
+                            )
 
                         elif file.endswith((".dds", ".png", ".jpg", ".mask")):
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TEXTURE), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TEXTURE), file)
+                            )
 
                         elif file.endswith((".sii", ".sui", ".txt", ".cfg", ".dat", ".soundref")):
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TEXT), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.TEXT), file)
+                            )
 
                         else:
-                            self.fileList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.FILE), file))
+                            self.fileList.addItem(
+                                QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.FILE), file)
+                            )
 
         # handle custom mode
         elif self.PIX_MODE == "custom":
@@ -361,22 +386,32 @@ class PixInterface(QWidget, Ui_PIX):
             f = open("pix.log", "a")
             f.write("=====  Start  =====")
             for line in output[5:]:
-                f.write(f"{line}\n")            
+                f.write(f"{line}\n")
             f.write("=====   End   =====\n\n")
             f.close()
 
             # handle warning and error and show infobar
-            if "<warning>" in decoded: self.infoBar("warning")
-            elif "<error>" in decoded: self.infoBar("error")
-            elif "No" in decoded: self.infoBar("error")
-            elif "Unable" in decoded: self.infoBar("error")
-            elif "Cannot" in decoded: self.infoBar("error")
-            elif "Failed" in decoded: self.infoBar("error")
-            elif "readDir" in decoded: self.infoBar("error")
-            elif "Invalid parameters" in decoded: self.infoBar("error")
-            elif "Unknown filesystem type" in decoded: self.infoBar("error")
-            else: self.infoBar("success")
-        
+            if "<warning>" in decoded:
+                self.infoBar("warning")
+            elif "<error>" in decoded:
+                self.infoBar("error")
+            elif "No" in decoded:
+                self.infoBar("error")
+            elif "Unable" in decoded:
+                self.infoBar("error")
+            elif "Cannot" in decoded:
+                self.infoBar("error")
+            elif "Failed" in decoded:
+                self.infoBar("error")
+            elif "readDir" in decoded:
+                self.infoBar("error")
+            elif "Invalid parameters" in decoded:
+                self.infoBar("error")
+            elif "Unknown filesystem type" in decoded:
+                self.infoBar("error")
+            else:
+                self.infoBar("success")
+
             logger.info("Pix process ended and output saved in pix.log file")
 
     def handleMainState(self, state):
@@ -395,8 +430,16 @@ class PixInterface(QWidget, Ui_PIX):
             # running state
             if state_name == "Running":
                 # show working infobar
-                self.workingInfobar = InfoBar.new(InfoBarIcon.INFORMATION, "Working", "Executing task", Qt.Horizontal,
-                                                False, -1, InfoBarPosition.TOP, self)
+                self.workingInfobar = InfoBar.new(
+                    InfoBarIcon.INFORMATION,
+                    "Working",
+                    "Executing task",
+                    Qt.Horizontal,
+                    False,
+                    -1,
+                    InfoBarPosition.TOP,
+                    self,
+                )
                 workingWgt = IndeterminateProgressRing(self)
                 workingWgt.setFixedSize(22, 22)
                 workingWgt.setStrokeWidth(4)
@@ -408,12 +451,12 @@ class PixInterface(QWidget, Ui_PIX):
                 self.folderList.setDisabled(True)
 
                 logger.info("Pix Process Running")
-        
+
             # finish state
             elif state_name == "NotRunning":
                 # close working infobar
                 self.workingInfobar.close()
-                
+
                 # enable back, buttons and lists again
                 self.runButton.setEnabled(True)
                 self.fileList.setEnabled(True)
@@ -425,10 +468,9 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.mainProcess = None
 
-
     def pixAnimProcess(self, args):
         """Main process to run Convertex PIX exe file (Anim)"""
-        
+
         # check if scs path is not empty
         if self.SCS_FILES == "":
             logger.error("SCS file path is not set and operation canceled")
@@ -457,7 +499,7 @@ class PixInterface(QWidget, Ui_PIX):
         self.animList.clearSelection()
         self.animList.clear()
         self.SELECTED_ANIM_FILES = []
-        
+
         self.animList.addItem(QListWidgetItem(FluentIconBase.qicon(FluentIcon.UP), ".."))
 
         folder = []
@@ -481,7 +523,7 @@ class PixInterface(QWidget, Ui_PIX):
         # add items in list to list view
         for dir in folder:
             self.animList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.FOLDER), dir))
-        
+
         for anim in anim:
             self.animList.addItem(QListWidgetItem(FluentIconBase.qicon(ScsHubIcon.ANIM), anim))
 
@@ -489,13 +531,14 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.animProcess = None
 
-
     def removeSubPathEnd(self):
         """Check and remove last selected filename in subpath if it exist"""
 
         if self.SUB_PATH.endswith(self.LAST_SELECTED_FILE):
             self.SUB_PATH = self.SUB_PATH.replace(self.LAST_SELECTED_FILE, "")
-        logger.info(f"Check and remove last selected file:({self.LAST_SELECTED_FILE}) in subpath if it exist and refresh list")
+        logger.info(
+            f"Check and remove last selected file:({self.LAST_SELECTED_FILE}) in subpath if it exist and refresh list"
+        )
 
     def resetSubPath(self):
         """Reset subpath to / and run again and go back to the root of scs file"""
@@ -510,17 +553,16 @@ class PixInterface(QWidget, Ui_PIX):
 
     def refreshSubPath(self):
         """Refresh current subpath without going to root of scs file"""
-        
+
         logger.info("Refresh curent subpath without reset and refresh list")
 
         # check and remove last selected filename in subpath if it exist
         self.removeSubPathEnd()
-            
+
         self.fileList.clearSelection()
         self.animList.clearSelection()
         self.listdirMode()
         self.animMode()
-
 
     def switchDir(self, selected):
         """Switch to chosen directory in navigation bar"""
@@ -532,7 +574,9 @@ class PixInterface(QWidget, Ui_PIX):
         # find selected item index in saved subpath string and
         # delete all after item name itself and update new subpath
         if self.SUB_PATH != "/":
-            newDir = self.SUB_PATH[0:self.SUB_PATH.rfind(selected[:-2])+len(selected[:-2])].replace("\\", "/")
+            newDir = self.SUB_PATH[
+                0 : self.SUB_PATH.rfind(selected[:-2]) + len(selected[:-2])
+            ].replace("\\", "/")
             self.SUB_PATH = newDir
 
         self.listdirMode()
@@ -546,7 +590,7 @@ class PixInterface(QWidget, Ui_PIX):
         if selected != "":
             # check and remove last selected filename in subpath if it exist
             self.removeSubPathEnd()
-                
+
             # update subpath and add selected folder name to end of it
             self.SUB_PATH = os.path.join(self.SUB_PATH, selected).replace("\\", "/")
             self.LAST_SELECTED_FOLDER = self.SUB_PATH
@@ -561,7 +605,7 @@ class PixInterface(QWidget, Ui_PIX):
 
     def indexFile(self, selected):
         """Add selected file and update subpath"""
-        
+
         # check and remove last selected filename in subpath if it exist
         self.removeSubPathEnd()
 
@@ -571,7 +615,9 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.LAST_SELECTED_FILE = selected
 
-        logger.info(f'Add ({self.LAST_SELECTED_FILE}) to subpath and new subpath is "{self.SUB_PATH}"')
+        logger.info(
+            f'Add ({self.LAST_SELECTED_FILE}) to subpath and new subpath is "{self.SUB_PATH}"'
+        )
 
     def indexAnimFolder(self, selected):
         """Add selected anim folder and update anim path"""
@@ -605,19 +651,20 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.SELECTED_ANIM_FILES = selectedList
 
-        logger.info(f'Current anim list is ({self.SELECTED_ANIM_FILES})')
-        
+        logger.info(f"Current anim list is ({self.SELECTED_ANIM_FILES})")
 
     def getScsFiles(self):
         """Get SCS file paths"""
 
-        filePaths = QFileDialog().getOpenFileNames(self, "Select SCS Archives", filter="SCS Archives (*.zip *.scs)")
+        filePaths = QFileDialog().getOpenFileNames(
+            self, "Select SCS Archives", filter="SCS Archives (*.zip *.scs)"
+        )
         if filePaths[0]:
             self.SCS_FILES = filePaths[0]
             InfoBar.success("Success", "SCS Archives selected", duration=1500, parent=self)
             logger.info(f'Set scs file paths to "{str(filePaths[0])}"')
             self.resetSubPath()
-        
+
         # enable function after file selected
         if not self.SCS_FILES == []:
             self.selectOutputButton.setEnabled(True)
@@ -633,7 +680,7 @@ class PixInterface(QWidget, Ui_PIX):
             self.openScsSuccessBadge = InfoBadge.success("", self, self.selectScsButton)
             self.openScsSuccessBadge.setFixedSize(9, 9)
             self.openScsSuccessBadge.show()
-    
+
     def getExportPath(self):
         """Get Export path"""
 
@@ -642,14 +689,20 @@ class PixInterface(QWidget, Ui_PIX):
             self.EXPORT_PATH = dirPath
             logger.info(f'Set export path to "{dirPath}"')
 
-    
     def infoBar(self, type):
         """Show info bar"""
 
         match type:
             case "success":
-                success = InfoBar.success("Success", "Finished succesfully",
-                                      Qt.Vertical, True, 3000, InfoBarPosition.TOP_RIGHT, self)
+                success = InfoBar.success(
+                    "Success",
+                    "Finished succesfully",
+                    Qt.Vertical,
+                    True,
+                    3000,
+                    InfoBarPosition.TOP_RIGHT,
+                    self,
+                )
                 logger.info("Operation completed successfully")
                 # if windows, show open button
                 if platform == "win32":
@@ -658,22 +711,29 @@ class PixInterface(QWidget, Ui_PIX):
 
                     # check export path and if it is empty, replace it with scs path with "_exp" suffix
                     if self.EXPORT_PATH == "":
-                        outPath = f'{self.SCS_FILES[0]}_exp'
+                        outPath = f"{self.SCS_FILES[0]}_exp"
                         rootPath = outPath.replace("/", "\\")
                     else:
                         outPath = self.EXPORT_PATH
                         rootPath = outPath.replace("/", "\\")
                     subPath = self.LAST_SELECTED_FOLDER
-                    folderPath = f'{outPath}{subPath}'.replace("/", "\\")
+                    folderPath = f"{outPath}{subPath}".replace("/", "\\")
 
                     openFolder.clicked.connect(lambda: Popen(f"explorer.exe {folderPath}"))
                     openRoot.clicked.connect(lambda: Popen(f"explorer.exe {rootPath}"))
                     success.addWidget(openFolder)
                     success.addWidget(openRoot)
 
-            case "error":   
-                error = InfoBar.error("Failed", "There is error in process\nCheck log file.",
-                                      Qt.Vertical, True, 4000, InfoBarPosition.TOP_RIGHT, self)
+            case "error":
+                error = InfoBar.error(
+                    "Failed",
+                    "There is error in process\nCheck log file.",
+                    Qt.Vertical,
+                    True,
+                    4000,
+                    InfoBarPosition.TOP_RIGHT,
+                    self,
+                )
                 logger.error("Operation completed with error, check pix.log file")
                 if platform == "win32":
                     openLog = PushButton("Open Log")
@@ -681,14 +741,20 @@ class PixInterface(QWidget, Ui_PIX):
                     error.addWidget(openLog)
 
             case "warning":
-                warning = InfoBar.warning("Failed", "There is warning in process\nCheck log file.",
-                                      Qt.Vertical, True, 4000, InfoBarPosition.TOP_RIGHT, self)
+                warning = InfoBar.warning(
+                    "Failed",
+                    "There is warning in process\nCheck log file.",
+                    Qt.Vertical,
+                    True,
+                    4000,
+                    InfoBarPosition.TOP_RIGHT,
+                    self,
+                )
                 logger.error("Operation completed with error, check pix.log file")
                 if platform == "win32":
                     openLog = PushButton("Open Log")
                     openLog.clicked.connect(lambda: Popen("notepad.exe pix.log"))
                     warning.addWidget(openLog)
-
 
     def donwloadPix(self):
 
@@ -702,13 +768,21 @@ class PixInterface(QWidget, Ui_PIX):
 
         self.downloadPixButton.setDisabled(True)
 
-        self.downloadInfobar = InfoBar.new(InfoBarIcon.INFORMATION, "Working", "Downloading ConverterPIX", Qt.Horizontal,
-                                            False, -1, InfoBarPosition.TOP, self)
+        self.downloadInfobar = InfoBar.new(
+            InfoBarIcon.INFORMATION,
+            "Working",
+            "Downloading ConverterPIX",
+            Qt.Horizontal,
+            False,
+            -1,
+            InfoBarPosition.TOP,
+            self,
+        )
         downloadWgt = IndeterminateProgressRing(self)
         downloadWgt.setFixedSize(22, 22)
         downloadWgt.setStrokeWidth(4)
         self.downloadInfobar.addWidget(downloadWgt)
-            
+
     def downloadPixFinish(self, result):
 
         self.downloadInfobar.close()
@@ -722,11 +796,13 @@ class PixInterface(QWidget, Ui_PIX):
                 self.downloadPixButton.hide()
                 self.downloadPixButton.setDisabled(True)
                 self.selectScsButton.setEnabled(True)
-                
+
                 InfoBar.success("Success", "ConverterPIX downloaded", duration=2000, parent=self)
 
                 logger.info("ConverterPix updated!")
 
             case 1:
                 self.downloadPixButton.setEnabled(True)
-                InfoBar.error("Failed", "Error during downloading\nCheck internet", duration=2000, parent=self)
+                InfoBar.error(
+                    "Failed", "Error during downloading\nCheck internet", duration=2000, parent=self
+                )
