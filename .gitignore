@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+*/__pycache__
+*.py[cod]
+*$py.class
+
+# vscode
+.vscode/
+.VSCodeCounter
+
+# scshub
+*.log
+tools/config.json
+tools/converter_pix.exe
+tools/scs_extractor.exe

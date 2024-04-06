@@ -1,0 +1,14 @@
+#view {
+    background-color: transparent;
+}
+#homeLabel {
+    font: 42px 'Segoe UI SemiBold', 'Microsoft YaHei SemiBold';
+    background-color: transparent;
+    color: black;
+    padding-left: 20px;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
