@@ -7,7 +7,6 @@
 
 <p align="center">
   <img alt="GitHub Release" src="https://img.shields.io/github/v/release/AmirMahdaviAM/SCSHub">
-  <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/AmirMahdaviAM/SCSHub">
   <img alt="python" src="https://img.shields.io/badge/python-v3.10.6+-blue.svg">
   <img alt="code style" src="https://img.shields.io/badge/code%20style-black-black.svg">
 </p>
@@ -17,6 +16,25 @@
   <img align="center" src="image/home.png">
   <img align="center" src="image/converter_pix.png">
 </p>
+
+## Install
+- Windows
+  - Download `SCSHub_x.x-windows.zip` asset from [releases](https://github.com/AmirMahdaviAM/SCSHub/releases), extract and run .exe file
+  - Or you can procced with below instruction
+- Linux, Mac
+  - Required `Python 3.10+` (maybe lower, not tested)
+  - Clone repo or download repo zip
+  ```shell
+  git clone https://github.com/AmirMahdaviAM/SCSHub
+  ```
+  - Install requirements
+  ```shell
+  pip install -r requirements.txt
+  ```
+  - Run app
+  ```shell
+  python SCSHub.py
+  ```
 
 ## Feature
 - [x] [**Converter PIX**](https://forum.scssoft.com/viewtopic.php?t=216158)

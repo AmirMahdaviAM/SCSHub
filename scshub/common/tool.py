@@ -21,8 +21,7 @@ INSTAGRAM = "https://instagram.com/amirmdvl"
 # link
 SCSHUB_GITHUB_URL = "https://github.com/AmirMahdaviAM/SCSHub/"
 SCSHUB_FEEDBACK_URL = "https://github.com/AmirMahdaviAM/SCSHub/issues"
-SCSHUB_FORUM_URL = "https://forum.scssoft.com"
-FORUM_URL = "https://forum.scssoft.com"
+SCSHUB_FORUM_URL = "https://forum.scssoft.com/viewtopic.php?t=328411"
 
 # set tools path
 TOOLS_PATH = os.path.join(os.getcwd(), "tools")

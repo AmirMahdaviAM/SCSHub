@@ -1,0 +1,3 @@
+PyQt5>=5.15.0
+PyQt-Fluent-Widgets>=1.5.2
+requests>=2.30.0

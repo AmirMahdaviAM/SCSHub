@@ -73,7 +73,7 @@ class MainWindow(MSFluentWindow):
         
         # bottom
         self.navigationInterface.addItem( "theme", FluentIcon.CONSTRACT, self.tr("Theme"), toggleTheme, False, position=NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.settingInterface, FluentIcon.LIBRARY, self.tr("Settings"), FluentIcon.LIBRARY_FILL, NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.settingInterface, FluentIcon.SETTING, self.tr("Settings"), position=NavigationItemPosition.BOTTOM)
 
         # set active interface
         self.navigationInterface.setCurrentItem(self.homeInterface.objectName())

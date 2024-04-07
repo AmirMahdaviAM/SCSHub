@@ -47,20 +47,11 @@ class ScsInterface(QWidget, Ui_SCS):
 
     def initUi(self):
 
-        # create badge for run button
-        self.runErrorBadge = InfoBadge()
-        self.runSuccessBadge = InfoBadge()
-
         # checking for converter pix file and download it if not exist
         if os.path.isfile(SCS_PATH):
-            self.runSuccessBadge = InfoBadge.success("", self, self.runButton)
-            self.runSuccessBadge.setFixedSize(9, 9)
             self.downloadScsButton.hide()
             logger.info("SCSExtractor exist")
         else:
-            self.runErrorBadge = InfoBadge.error("", self, self.runButton)
-            self.runErrorBadge.setFixedSize(9, 9)
-            self.runErrorBadge.show()
             self.selectScsButton.setDisabled(True)
             self.downloadScsButton.clicked.connect(lambda: self.donwloadScs())
             logger.info("SCSExtractor not exist")
@@ -311,10 +302,6 @@ class ScsInterface(QWidget, Ui_SCS):
 
         match result:
             case 0:
-                self.runErrorBadge.hide()
-                self.runSuccessBadge = InfoBadge.success("", self, self.runButton)
-                self.runSuccessBadge.setFixedSize(9, 9)
-                self.runSuccessBadge.show()
                 self.downloadScsButton.hide()
                 self.downloadScsButton.setDisabled(True)
                 self.selectScsButton.setEnabled(True)
@@ -325,6 +312,7 @@ class ScsInterface(QWidget, Ui_SCS):
 
             case 1:
                 self.downloadScsButton.setEnabled(True)
+                
                 InfoBar.error(
                     "Failed", "Error during downloading\nCheck internet", duration=2000, parent=self
                 )

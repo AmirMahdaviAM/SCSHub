@@ -80,20 +80,11 @@ class PixInterface(QWidget, Ui_PIX):
 
     def initUi(self):
 
-        # create badge for run button
-        self.runErrorBadge = InfoBadge()
-        self.runSuccessBadge = InfoBadge()
-
         # checking for converter pix file and download it if not exist
         if os.path.isfile(PIX_PATH):
-            self.runSuccessBadge = InfoBadge.success("", self, self.runButton)
-            self.runSuccessBadge.setFixedSize(9, 9)
             self.downloadPixButton.hide()
             logger.info("ConverterPIX exist")
         else:
-            self.runErrorBadge = InfoBadge.error("", self, self.runButton)
-            self.runErrorBadge.setFixedSize(9, 9)
-            self.runErrorBadge.show()
             self.selectScsButton.setDisabled(True)
             self.downloadPixButton.clicked.connect(lambda: self.donwloadPix())
             logger.info("ConverterPIX not exist")
@@ -789,10 +780,6 @@ class PixInterface(QWidget, Ui_PIX):
 
         match result:
             case 0:
-                self.runErrorBadge.hide()
-                self.runSuccessBadge = InfoBadge.success("", self, self.runButton)
-                self.runSuccessBadge.setFixedSize(9, 9)
-                self.runSuccessBadge.show()
                 self.downloadPixButton.hide()
                 self.downloadPixButton.setDisabled(True)
                 self.selectScsButton.setEnabled(True)
@@ -803,6 +790,7 @@ class PixInterface(QWidget, Ui_PIX):
 
             case 1:
                 self.downloadPixButton.setEnabled(True)
+
                 InfoBar.error(
                     "Failed", "Error during downloading\nCheck internet", duration=2000, parent=self
                 )
