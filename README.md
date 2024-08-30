@@ -2,7 +2,7 @@
   <img width="30%" align="center" src="scshub/resource/vector/logo_splash.svg" alt="logo">
 </p>
 <p align="center">
-  An app to gather most of SCS games modding tools in one place
+  SCS games modding tools in one place
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@
 
 ## Install
 - Windows
-  - Download `SCSHub_x.x-windows.zip` asset from [**Releases**](https://github.com/AmirMahdaviAM/SCSHub/releases), extract and run .exe file
+  - Download `SCSHub_x.x.exe` asset from [**Releases**](https://github.com/AmirMahdaviAM/SCSHub/releases), extract and run .exe file
   - Or you can procced with below instruction
 - Linux, Mac
   - Required `Python 3.10+` (maybe lower, not tested)
@@ -42,12 +42,14 @@
   - [x] Official extractor and packer
   - [x] Implemented feature
 - [x] [**Converter PIX**](https://forum.scssoft.com/viewtopic.php?t=216158)
+  - [x] Multi base input
   - [x] Single Model and Single TOBJ mode with conversion 
   - [x] Extract specific File or Folder without conversion
   - [x] Animation export
-  - [x] Past 1.47 material attributes
   - [x] Use old dds format
-  - [x] Multi base input
+  - [x] Past 1.47 material attributes
+  - [x] Animation finder
+  - [x] File and string hasher
   - [ ] Convert whole archive
 - [x] [**SXC Extractor**](https://forum.scssoft.com/viewtopic.php?t=276948)
   - [x] Single click finder & extractor (SXCFinder + My new path finder)
