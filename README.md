@@ -56,22 +56,22 @@
   - [x] SXC Packer
   - [x] SXC Finder
   - [ ] SXC Extractor
-- [x] [**TOBJ Editor**]
+- [x] **TOBJ Editor**
   - [x] Full attributes tobj editor and creator
   - [x] Binary formant (import and export)
   - [x] Text formant (only export)
   - [x] 2D tobj support
   - [ ] Cube tobj support
-- [x] [**Def creator**]
+- [x] **Def creator**
   - [x] Create simple def from pmd/pim accessory folder
   - [x] Custom directory names
   - [x] Custom name and filenames
   - [ ] Create def for hookups
-- [ ] [**Sii Editor**]
-- [ ] [**Sii Decryptor**]
-- [ ] [**DDS to TGA**]
-- [ ] [**Save Editor**]
-- [ ] [**Font Creator**]
+- [ ] **Sii Editor**
+- [ ] **Sii Decryptor**
+- [ ] **DDS to TGA**
+- [ ] **Save Editor**
+- [ ] **Font Creator**
 
 ## Known issue
 - App
