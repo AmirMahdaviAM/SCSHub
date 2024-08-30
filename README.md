@@ -38,7 +38,7 @@
   ```
 
 ## Feature
-- [x] [**SCS Extractor**](https://modding.scssoft.com/wiki/Documentation/Tools/Game_Archive_Extractor)
+- [x] [**SCS Extractor**](https://modding.scssoft.com/wiki/Documentation/Tools/Game_Archive_Packer)
   - [x] Official extractor and packer
   - [x] Implemented feature
 - [x] [**Converter PIX**](https://forum.scssoft.com/viewtopic.php?t=216158)
