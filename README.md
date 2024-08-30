@@ -20,7 +20,7 @@
 
 ## Install
 - Windows
-  - Download `SCSHub_x.x.exe` asset from [**Releases**](https://github.com/AmirMahdaviAM/SCSHub/releases), extract and run .exe file
+  - Download `SCSHub_x.x.exe` asset from [**Releases**](https://github.com/AmirMahdaviAM/SCSHub/releases) and run file
   - Or you can procced with below instruction
 - Linux, Mac
   - Required `Python 3.10+` (maybe lower, not tested)
