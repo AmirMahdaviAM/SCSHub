@@ -77,7 +77,7 @@
 - App
   - Not tested in Linux and Mac
   - `Open log` and `Open Folder` buttons in InfoBar only work in windows
-- SCS Extractor
+- SCS Tools & SXC Extractor
   - Only work in windows
 - Converter PIX
   - Ctrl + A in anim list will select all file and folder (just `Select & drag mouse` or `Single click`)
