@@ -1,0 +1,15 @@
+#title_label {
+    color: black;
+    font: 14px 'Segoe UI';
+    font-weight: bold;
+}
+
+#content_label {
+    color: rgb(118, 118, 118);
+    font: 12px 'Segoe UI';
+}
+
+#view_title_label {
+    color: black;
+    font: 20px "Segoe UI SemiBold";
+}

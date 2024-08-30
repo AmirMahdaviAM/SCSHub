@@ -1,39 +1,57 @@
-from PyQt5.QtCore import Qt, QUrl, QSize
-from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtWidgets import QWidget, QLabel, QSizePolicy, QSpacerItem, QHBoxLayout, QVBoxLayout
+import logging
+import os
+
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QDesktopServices, QFont
+from PyQt5.QtWidgets import QWidget, QSizePolicy, QHBoxLayout, QVBoxLayout
 
 from qfluentwidgets import (
-    SettingCardGroup,
-    SettingCard,
-    CustomColorSettingCard,
     PrimaryPushSettingCard,
-    OptionsSettingCard,
-    HyperlinkLabel,
     ComboBoxSettingCard,
+    OptionsSettingCard,
+    VerticalSeparator,
     SwitchSettingCard,
     SimpleCardWidget,
-    ExpandLayout,
-    ScrollArea,
-    InfoBar,
-    FluentIcon,
-    AvatarWidget,
-    BodyLabel,
+    SettingCardGroup,
+    ColorSettingCard,
+    PushSettingCard,
     StrongBodyLabel,
+    HyperlinkLabel,
+    CaptionLabel,
+    AvatarWidget,
+    SettingCard,
+    IconWidget,
+    ScrollArea,
+    FluentIcon,
+    BodyLabel,
+    setFont,
     setTheme,
     setThemeColor,
 )
 
-from ...common.config import cfg, isWin11
 from ...common.tool import (
-    StyleSheet,
-    signalBus,
-    VERSION,
-    YEAR,
-    SCSHUB_FEEDBACK_URL,
-    GITHUB,
-    TELEGRAM,
-    INSTAGRAM,
+    ScsHubDialog,
+    signal_bus,
+    scshub_infobar,
+    scshub_dir_remover,
+    scshub_file_remover,
 )
+from ...common.config import cfg, is_win11
+from ...common.info import (
+    SCSHUB_FEEDBACK_URL,
+    PIX_CONVERTER_INFO,
+    SCS_TOOL_INFO,
+    TOOLS_PATH,
+    INSTAGRAM,
+    TELEGRAM,
+    SXC_INFO,
+    VERSION,
+    GITHUB,
+    YEAR,
+)
+
+
+logger = logging.getLogger("SCSHub")
 
 
 class SettingInterface(ScrollArea):
@@ -41,70 +59,131 @@ class SettingInterface(ScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
 
-        self.scrollWidget = QWidget()
-        self.expandLayout = ExpandLayout(self.scrollWidget)
+        self.setObjectName("setting_interface")
 
-        # setting label
-        self.settingLabel = QLabel(self.tr("Settings"), self)
+        self.main_widget = QWidget()
+        self.main_widget.setStyleSheet("background-color: transparent;")
+
+        self.main_lyt = QVBoxLayout(self.main_widget)
+        self.main_lyt.setContentsMargins(0, 0, 0, 0)
+        self.main_lyt.setSpacing(30)
+        self.setting_label = BodyLabel(self.tr("Settings"), self.main_widget)
+        self.setting_label.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        setFont(self.setting_label, 33, QFont.Light)
+
+        self.setViewportMargins(36, 36, 36, 36)
+        self.setWidget(self.main_widget)
+        self.setWidgetResizable(True)
+        self.setStyleSheet("border: none; background-color: transparent;")
 
         self.cards()
         self.profile()
-        self.initUi()
-        self.connectSignalToSlot()
+        self.wiki()
+        self.signal_bus()
+
+        # personalization
+        self.personal_group.addSettingCard(self.mica_card)
+        self.personal_group.addSettingCard(self.colorize_card)
+        self.personal_group.addSettingCard(self.theme_card)
+        self.personal_group.addSettingCard(self.theme_color_card)
+        self.personal_group.addSettingCard(self.zoom_card)
+        self.personal_group.addSettingCard(self.language_card)
+        self.personal_group.addSettingCard(self.reset_card)
+
+        # about
+        self.about_group.addSettingCard(self.profile_card)
+        self.about_group.addSettingCard(self.wiki_card)
+        self.about_group.addSettingCard(self.feedback_card)
+        self.about_group.addSettingCard(self.about_card)
+
+        self.main_lyt.addWidget(self.setting_label)
+        self.main_lyt.addWidget(self.personal_group)
+        self.main_lyt.addWidget(self.about_group)
+        self.main_lyt.addStretch(1)
+
+    def edge_spacer(self, width):
+
+        spacer_width = int((width - 1070) / 2)
+        self.setViewportMargins(spacer_width, 36, spacer_width, 36)
 
     def cards(self):
 
-        self.personalGroup = SettingCardGroup(self.tr("Personalization"), self.scrollWidget)
+        # personalization
+        self.personal_group = SettingCardGroup(self.tr("Personalization"), self.main_widget)
 
-        self.micaCard = SwitchSettingCard(
+        self.mica_card = SwitchSettingCard(
             FluentIcon.TRANSPARENT,
             self.tr("Mica effect"),
-            self.tr("Apply semi transparent to windows and surfaces"),
-            cfg.micaEnabled,
-            self.personalGroup,
+            self.tr("Apply semi-transparent to windows and surfaces (Win11)"),
+            cfg.mica_effect,
+            self.personal_group,
         )
-        self.themeCard = OptionsSettingCard(
+        self.mica_card.setEnabled(is_win11())
+
+        self.colorize_card = SwitchSettingCard(
+            FluentIcon.BACKGROUND_FILL,
+            self.tr("Colorize home banner"),
+            self.tr("Dynamic or static color for home top banner (affect performence)"),
+            cfg.colorize,
+            self.personal_group,
+        )
+
+        self.theme_card = OptionsSettingCard(
             cfg.themeMode,
             FluentIcon.BRUSH,
             self.tr("Application theme"),
-            self.tr("Change the appearance of your application"),
+            self.tr("Change the theme appearance"),
             texts=[self.tr("Light"), self.tr("Dark"), self.tr("Use system setting")],
-            parent=self.personalGroup,
+            parent=self.personal_group,
         )
-        self.themeColorCard = CustomColorSettingCard(
+
+        self.theme_color_card = ColorSettingCard(
             cfg.themeColor,
             FluentIcon.PALETTE,
             self.tr("Theme color"),
-            self.tr("Change the theme color of you application"),
-            self.personalGroup,
+            self.tr("Change the theme color"),
+            self.personal_group,
         )
-        self.zoomCard = ComboBoxSettingCard(
-            cfg.dpiScale,
+        self.theme_color_card.colorPicker.setFixedWidth(78)
+
+        self.zoom_card = ComboBoxSettingCard(
+            cfg.dpi_scale,
             FluentIcon.ZOOM,
             self.tr("Interface zoom"),
             self.tr("Change the size of widgets and fonts"),
             texts=["100%", "125%", "150%", "175%", "200%", self.tr("Use system setting")],
-            parent=self.personalGroup,
+            parent=self.personal_group,
         )
-        self.languageCard = ComboBoxSettingCard(
+
+        self.language_card = ComboBoxSettingCard(
             cfg.language,
             FluentIcon.LANGUAGE,
             self.tr("Language"),
-            self.tr("Set your preferred language for UI"),
+            self.tr("Set preferred language for UI"),
             texts=["English", self.tr("Use system setting")],
-            parent=self.personalGroup,
+            parent=self.personal_group,
         )
 
-        self.aboutGroup = SettingCardGroup(self.tr("About"), self.scrollWidget)
+        self.reset_card = PushSettingCard(
+            self.tr("Reset app"),
+            FluentIcon.BROOM,
+            self.tr("Reset app"),
+            self.tr("Delete all tools files and app config"),
+            self.personal_group,
+        )
 
-        self.feedbackCard = PrimaryPushSettingCard(
+        # about
+        self.about_group = SettingCardGroup(self.tr("About"), self.main_widget)
+
+        self.feedback_card = PrimaryPushSettingCard(
             self.tr("Provide feedback"),
             FluentIcon.FEEDBACK,
             self.tr("Provide feedback"),
             self.tr("Help us improve SCS Hub by providing feedback"),
-            self.aboutGroup,
+            self.about_group,
         )
-        self.aboutCard = SettingCard(
+
+        self.about_card = SettingCard(
             FluentIcon.INFO,
             self.tr("About"),
             "© "
@@ -113,128 +192,180 @@ class SettingInterface(ScrollArea):
             + self.tr("Version")
             + " "
             + VERSION,
-            self.aboutGroup,
+            self.about_group,
         )
 
     def profile(self):
-        self.profileCard = SimpleCardWidget(self.scrollWidget)
-        self.profileCard.setMinimumSize(QSize(16777215, 130))
-        self.profileCard.setMaximumSize(QSize(16777215, 130))
-        self.profileCard.setObjectName("profileCard")
 
-        self.profileLayout = QHBoxLayout(self.profileCard)
-        self.profileLayout.setContentsMargins(16, 0, 0, 0)
-        self.profileLayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.profileLayout.setObjectName("profileLayout")
+        self.profile_card = SimpleCardWidget(self.main_widget)
+        self.profile_card.setFixedHeight(120)
 
-        self.avatar = AvatarWidget(self.profileCard)
+        self.profile_lyt = QHBoxLayout(self.profile_card)
+        self.profile_lyt.setContentsMargins(16, 0, 0, 0)
+        self.profile_lyt.setSpacing(16)
+        self.profile_lyt.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+
+        # avatar
+        self.avatar = AvatarWidget(self.profile_card)
         self.avatar.setObjectName("avatar")
-        self.avatar.setImage(":/SCSHub/image/avatar.png")
-        self.avatar.setRadius(48)
+        self.avatar.setImage(":/image/avatar.png")
+        self.avatar.setRadius(40)
 
-        spacerItem = QSpacerItem(16, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        # text
+        self.profile_text_lyt = QVBoxLayout()
+        self.profile_text_lyt.setSpacing(0)
+        self.profile_text_lyt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.textLayout = QVBoxLayout()
-        self.textLayout.setObjectName("textLayout")
+        self.profile_name_label = StrongBodyLabel(self.profile_card)
+        self.profile_name_label.setText("Amir Mahdavi")
+        self.profile_name_label.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
-        spacerItem1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.profile_email_label = BodyLabel(self.profile_card)
+        self.profile_email_label.setText("mahdaviamir33@gmail.com")
+        self.profile_email_label.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
 
-        self.nameLabel = StrongBodyLabel(self.profileCard)
-        self.nameLabel.setObjectName("nameLabel")
-        self.nameLabel.setText("Amir Mahdavi")
+        # link
+        self.profile_link_lyt = QHBoxLayout()
+        self.profile_link_lyt.setSpacing(10)
 
-        self.emailLabel = BodyLabel(self.profileCard)
-        self.emailLabel.setObjectName("emailLabel")
-        self.emailLabel.setText("mahdaviamir33@gmail.com")
+        self.profile_github_link = HyperlinkLabel("GitHub", self.profile_card)
+        self.profile_github_link.setUrl(GITHUB)
 
-        self.linkLayout = QHBoxLayout()
-        self.linkLayout.setObjectName("linkLayout")
-        self.linkLayout.setSpacing(16)
+        self.profile_telegram_link = HyperlinkLabel("Telegram", self.profile_card)
+        self.profile_telegram_link.setUrl(TELEGRAM)
 
-        self.githubLink = HyperlinkLabel("GitHub", self.profileCard)
-        self.githubLink.setObjectName("githubLink")
-        self.githubLink.setUrl(GITHUB)
+        self.profile_instagram_ink = HyperlinkLabel("Instagram", self.profile_card)
+        self.profile_instagram_ink.setUrl(INSTAGRAM)
 
-        self.telegramLink = HyperlinkLabel("Telegram", self.profileCard)
-        self.telegramLink.setObjectName("telegramLink")
-        self.telegramLink.setUrl(TELEGRAM)
+        self.profile_link_lyt.addWidget(self.profile_github_link)
+        self.profile_link_lyt.addWidget(self.profile_telegram_link)
+        self.profile_link_lyt.addWidget(self.profile_instagram_ink)
 
-        self.instagramLink = HyperlinkLabel("Instagram", self.profileCard)
-        self.instagramLink.setObjectName("instagramLink")
-        self.instagramLink.setUrl(INSTAGRAM)
+        self.profile_text_lyt.addWidget(self.profile_name_label)
+        self.profile_text_lyt.addWidget(self.profile_email_label)
+        self.profile_text_lyt.addSpacing(5)
+        self.profile_text_lyt.addLayout(self.profile_link_lyt)
 
-        spacerItem2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.profile_lyt.addWidget(self.avatar)
+        self.profile_lyt.addLayout(self.profile_text_lyt)
 
-        self.linkLayout.addWidget(self.githubLink)
-        self.linkLayout.addWidget(self.telegramLink)
-        self.linkLayout.addWidget(self.instagramLink)
+    def wiki(self):
 
-        self.textLayout.addItem(spacerItem1)
-        self.textLayout.addWidget(self.nameLabel)
-        self.textLayout.addWidget(self.emailLabel)
-        self.textLayout.addLayout(self.linkLayout)
-        self.textLayout.addItem(spacerItem2)
+        self.wiki_card = SimpleCardWidget(self.main_widget)
+        self.wiki_card.setFixedHeight(70)
 
-        self.profileLayout.addWidget(self.avatar)
-        self.profileLayout.addItem(spacerItem)
-        self.profileLayout.addLayout(self.textLayout)
+        self.wiki_ayout = QHBoxLayout(self.wiki_card)
+        self.wiki_ayout.setContentsMargins(16, 0, 0, 0)
+        self.wiki_ayout.setSpacing(0)
+        self.wiki_ayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-    def initUi(self):
-        self.resize(1000, 800)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setViewportMargins(0, 80, 0, 20)
-        self.setWidget(self.scrollWidget)
-        self.setWidgetResizable(True)
-        self.setObjectName("settingInterface")
+        # icon
+        self.wiki_con = IconWidget(FluentIcon.PEOPLE, self.wiki_card)
+        self.wiki_con.setFixedSize(16, 16)
 
-        self.scrollWidget.setObjectName("scrollWidget")
+        # scs
+        self.wiki_scs_lyt = QVBoxLayout()
+        self.wiki_scs_lyt.setSpacing(0)
 
-        self.settingLabel.setObjectName("settingLabel")
-        self.settingLabel.move(36, 30)
+        self.wiki_scs_ink = HyperlinkLabel("SCS Tool", self.wiki_card)
+        self.wiki_scs_ink.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_scs_ink.setUrl(SCS_TOOL_INFO)
 
-        self.micaCard.setEnabled(isWin11())
+        self.wiki_scs_autor = CaptionLabel(self.wiki_card)
+        self.wiki_scs_autor.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_scs_autor.setText("SCS Software")
 
-        # set custom stylesheet
-        StyleSheet.SETTING_INTERFACE.apply(self)
+        self.wiki_scs_lyt.addWidget(self.wiki_scs_ink)
+        self.wiki_scs_lyt.addWidget(self.wiki_scs_autor)
 
-        # add cards to group
-        self.personalGroup.addSettingCard(self.micaCard)
-        self.personalGroup.addSettingCard(self.themeCard)
-        self.personalGroup.addSettingCard(self.themeColorCard)
-        self.personalGroup.addSettingCard(self.zoomCard)
-        self.personalGroup.addSettingCard(self.languageCard)
+        # seprator
+        self.v_seprator_1 = VerticalSeparator()
 
-        self.aboutGroup.addSettingCard(self.profileCard)
-        self.aboutGroup.addSettingCard(self.feedbackCard)
-        self.aboutGroup.addSettingCard(self.aboutCard)
+        # pix_
+        self.wiki_pix_lyt = QVBoxLayout()
+        self.wiki_pix_lyt.setSpacing(0)
 
-        # add setting card group to layout
-        self.expandLayout.setSpacing(28)
-        self.expandLayout.setContentsMargins(36, 10, 36, 0)
-        self.expandLayout.addWidget(self.personalGroup)
-        self.expandLayout.addWidget(self.aboutGroup)
+        self.wiki_pix_link = HyperlinkLabel("PIX Converter", self.wiki_card)
+        self.wiki_pix_link.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_pix_link.setUrl(PIX_CONVERTER_INFO)
 
-    def restartInfoBar(self):
-        """Show restart tooltip"""
+        self.wiki_pix_autor = CaptionLabel(self.wiki_card)
+        self.wiki_pix_autor.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_pix_autor.setText("mwl4")
 
-        InfoBar.success(
-            self.tr("Success"),
-            self.tr("Configuration takes effect after restart"),
-            duration=1500,
-            parent=self,
+        self.wiki_pix_lyt.addWidget(self.wiki_pix_link)
+        self.wiki_pix_lyt.addWidget(self.wiki_pix_autor)
+
+        # seprator
+        self.v_seprator_2 = VerticalSeparator()
+
+        # sxc
+        self.wiki_sxc_lyt = QVBoxLayout()
+        self.wiki_sxc_lyt.setSpacing(0)
+
+        self.wiki_sxc_link = HyperlinkLabel("SXC Extractor", self.wiki_card)
+        self.wiki_sxc_link.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_sxc_link.setUrl(SXC_INFO)
+
+        self.wiki_sxc_autor = CaptionLabel(self.wiki_card)
+        self.wiki_sxc_autor.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        self.wiki_sxc_autor.setText("Madman")
+
+        self.wiki_sxc_lyt.addWidget(self.wiki_sxc_link)
+        self.wiki_sxc_lyt.addWidget(self.wiki_sxc_autor)
+
+        self.wiki_ayout.addWidget(self.wiki_con)
+        self.wiki_ayout.addSpacing(16)
+        self.wiki_ayout.addLayout(self.wiki_scs_lyt)
+        self.wiki_ayout.addSpacing(10)
+        self.wiki_ayout.addWidget(self.v_seprator_1)
+        self.wiki_ayout.addSpacing(10)
+        self.wiki_ayout.addLayout(self.wiki_pix_lyt)
+        self.wiki_ayout.addSpacing(10)
+        self.wiki_ayout.addWidget(self.v_seprator_2)
+        self.wiki_ayout.addSpacing(10)
+        self.wiki_ayout.addLayout(self.wiki_sxc_lyt)
+
+    def reset_app(self):
+
+        dialog = ScsHubDialog(
+            self.tr("Reset app"),
+            self.tr(
+                "Are you sure want to reset app and delete all data?\nThis action is Irreversible!"
+            ),
+            self.window(),
         )
 
-    def connectSignalToSlot(self):
-        """Connect signal to slot"""
+        if dialog.exec_():
+            scshub_file_remover("config.json")
+            scshub_dir_remover(TOOLS_PATH)
+            os.makedirs(TOOLS_PATH)
 
-        cfg.appRestartSig.connect(self.restartInfoBar)
+            signal_bus.pix_exist.emit(False)
+            signal_bus.sxc_exist.emit(False)
+            signal_bus.scs_exist.emit(False)
+
+            scshub_infobar(self, "success", self.tr("Configuration takes effect after restart"))
+            logger.info("All tools and app config deleted")
+
+    def signal_bus(self):
+
+        signal_bus.window_width.connect(self.edge_spacer)
+
+        cfg.appRestartSig.connect(
+            lambda: scshub_infobar(self, "success", "Configuration takes effect after restart")
+        )
 
         # personalization
-        self.themeCard.optionChanged.connect(lambda ci: setTheme(cfg.get(ci), lazy=True))
-        self.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c, lazy=True))
-        self.micaCard.checkedChanged.connect(signalBus.micaEnableChanged)
+        self.mica_card.checkedChanged.connect(signal_bus.mica_enabled)
+        self.theme_color_card.colorChanged.connect(lambda c: setThemeColor(c, lazy=True))
+        self.theme_card.optionChanged.connect(lambda ci: setTheme(cfg.get(ci), lazy=True))
+
+        # app
+        self.colorize_card.checkedChanged.connect(signal_bus.colorize)
+        self.reset_card.clicked.connect(lambda: self.reset_app())
 
         # about
-        self.feedbackCard.clicked.connect(
+        self.feedback_card.clicked.connect(
             lambda: QDesktopServices.openUrl(QUrl(SCSHUB_FEEDBACK_URL))
         )

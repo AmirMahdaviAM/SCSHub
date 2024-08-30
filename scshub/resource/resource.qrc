@@ -1,48 +1,63 @@
 <RCC>
-    <qresource prefix="/SCSHub">
-        <file>image/header.png</file>
+    <qresource prefix="">
         <file>image/avatar.png</file>
-        <file>image/splash.svg</file>
-        <file>image/logo.svg</file>
 
-        <file>icon/interface/pix_converter_black.svg</file>
-        <file>icon/interface/pix_converter_white.svg</file>
-        <file>icon/interface/pix_converter_fill_black.svg</file>
-        <file>icon/interface/pix_converter_fill_white.svg</file>
-        <file>icon/interface/scs_extractor_black.svg</file>
-        <file>icon/interface/scs_extractor_white.svg</file>
-        <file>icon/interface/scs_extractor_fill_black.svg</file>
-        <file>icon/interface/scs_extractor_fill_white.svg</file>
+        <file>image/banner_background_black.png</file>
+        <file>image/banner_background_white.png</file>
+        <file>image/banner_overlay_black.png</file>
+        <file>image/banner_overlay_white.png</file>
 
-        <file>icon/scs_white.svg</file>
-        <file>icon/scs_black.svg</file>
-        <file>icon/file_black.svg</file>
-        <file>icon/file_white.svg</file>
-        <file>icon/folder_black.svg</file>
-        <file>icon/folder_white.svg</file>
-        <file>icon/anim_black.svg</file>
-        <file>icon/anim_white.svg</file>
-        <file>icon/model_black.svg</file>
-        <file>icon/model_white.svg</file>
-        <file>icon/prefab_black.svg</file>
-        <file>icon/prefab_white.svg</file>
-        <file>icon/text_black.svg</file>
-        <file>icon/text_white.svg</file>
-        <file>icon/texture_black.svg</file>
-        <file>icon/texture_white.svg</file>
-        <file>icon/tobj_black.svg</file>
-        <file>icon/tobj_white.svg</file>
+        <file>vector/logo_black.svg</file>
+        <file>vector/logo_white.svg</file>
+        <file>vector/logo_color.svg</file>
+        <file>vector/logo_splash.svg</file>
 
-        <file>style/dark/home_interface.qss</file>
+        <file>vector/scs_white.svg</file>
+        <file>vector/scs_black.svg</file>
+
+        <file>vector/interface/pix_black.svg</file>
+        <file>vector/interface/pix_white.svg</file>
+        <file>vector/interface/pix_fill_black.svg</file>
+        <file>vector/interface/pix_fill_white.svg</file>
+        <file>vector/interface/scs_black.svg</file>
+        <file>vector/interface/scs_white.svg</file>
+        <file>vector/interface/scs_fill_black.svg</file>
+        <file>vector/interface/scs_fill_white.svg</file>
+        <file>vector/interface/pix_fill_white.svg</file>
+        <file>vector/interface/sxc_black.svg</file>
+        <file>vector/interface/sxc_white.svg</file>
+        <file>vector/interface/sxc_fill_black.svg</file>
+        <file>vector/interface/sxc_fill_white.svg</file>
+        <file>vector/interface/tobj_black.svg</file>
+        <file>vector/interface/tobj_white.svg</file>
+        <file>vector/interface/tobj_fill_black.svg</file>
+        <file>vector/interface/tobj_fill_white.svg</file>
+        <file>vector/interface/def_black.svg</file>
+        <file>vector/interface/def_white.svg</file>
+        <file>vector/interface/def_fill_black.svg</file>
+        <file>vector/interface/def_fill_white.svg</file>
+
+        <file>vector/file/file_black.svg</file>
+        <file>vector/file/file_white.svg</file>
+        <file>vector/file/folder_black.svg</file>
+        <file>vector/file/folder_white.svg</file>
+        <file>vector/file/anim_black.svg</file>
+        <file>vector/file/anim_white.svg</file>
+        <file>vector/file/model_black.svg</file>
+        <file>vector/file/model_white.svg</file>
+        <file>vector/file/prefab_black.svg</file>
+        <file>vector/file/prefab_white.svg</file>
+        <file>vector/file/text_black.svg</file>
+        <file>vector/file/text_white.svg</file>
+        <file>vector/file/texture_black.svg</file>
+        <file>vector/file/texture_white.svg</file>
+        <file>vector/file/tobj_black.svg</file>
+        <file>vector/file/tobj_white.svg</file>
+
         <file>style/dark/link_card.qss</file>
-        <file>style/dark/sample_card.qss</file>
-        <file>style/dark/setting_interface.qss</file>
-        <file>style/dark/standard_interface.qss</file>
+        <file>style/dark/interface_card.qss</file>
 
-        <file>style/light/home_interface.qss</file>
         <file>style/light/link_card.qss</file>
-        <file>style/light/sample_card.qss</file>
-        <file>style/light/setting_interface.qss</file>
-        <file>style/light/standard_interface.qss</file>
+        <file>style/light/interface_card.qss</file>
     </qresource>
 </RCC>

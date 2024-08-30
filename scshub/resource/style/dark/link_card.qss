@@ -1,21 +1,21 @@
 LinkCard {
-    border: 1px solid rgb(60, 60, 60);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    background-color: rgba(40, 40, 40, 0.70);
+    background-color: rgba(50, 50, 50, 0.92);
 }
 
 LinkCard:hover {
-    border: 1px solid rgb(90, 90, 90);
-    background-color: rgba(60, 60, 60, 0.80);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background-color: rgba(50, 50, 50, 1.0);
 }
 
-#titleLabel {
-    font: 18px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
+#title_label {
+    font: 18px 'Segoe UI';
     color: white;
 }
 
-#contentLabel {
-    font: 12px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC';
+#content_label {
+    font: 12px 'Segoe UI';
     color: rgb(208, 208, 208);
 }
 

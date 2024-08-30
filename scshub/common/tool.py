@@ -1,102 +1,113 @@
-import os, logging, requests
+import os
+import logging
+import shutil
+import zipfile
+import requests
 from sys import platform
 from enum import Enum
+from subprocess import Popen
 
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QObject, QThread, Qt
 
-from qfluentwidgets import FluentIconBase, Theme, StyleSheetBase, getIconColor, qconfig
-
-
-# set logger
-logger = logging.getLogger("SCSHub")
-
-
-# info
-YEAR = 2024
-VERSION = "1.0"
-GITHUB = "https://github.com/AmirMahdaviAM/"
-TELEGRAM = "https://t.me/amirmdvi"
-INSTAGRAM = "https://instagram.com/amirmdvl"
-
-# link
-SCSHUB_GITHUB_URL = "https://github.com/AmirMahdaviAM/SCSHub/"
-SCSHUB_FEEDBACK_URL = "https://github.com/AmirMahdaviAM/SCSHub/issues"
-SCSHUB_FORUM_URL = "https://forum.scssoft.com/viewtopic.php?t=328411"
-
-# set tools path
-TOOLS_PATH = os.path.join(os.getcwd(), "tools")
-
-# create tool path if not exist
-if not os.path.isdir(TOOLS_PATH):
-    os.makedirs(TOOLS_PATH, exist_ok=True)
-
-# set converter pix path and download url
-if platform == "linux":
-    PIX_URL = "https://github.com/simon50keda/ConverterPIX/raw/master/bin/linux/converter_pix"
-    PIX_PATH = os.path.join(TOOLS_PATH, "converter_pix")
-elif platform == "darwin":
-    PIX_URL = "https://github.com/theHarven/ConverterPIX/raw/MacOS_binary/bin/macos/converter_pix"
-    PIX_PATH = os.path.join(TOOLS_PATH, "converter_pix")
-else:
-    PIX_URL = "https://github.com/mwl4/ConverterPIX/raw/master/bin/win_x86/converter_pix.exe"
-    PIX_PATH = os.path.join(TOOLS_PATH, "converter_pix.exe")
-
-# set scs extractor path and download url
-SCS_URL = "https://github.com/AmirMahdaviAM/SCSHub/raw/master/tools/scs_extractor.exe"
-SCS_PATH = os.path.join(TOOLS_PATH, "scs_extractor.exe")
-
-logger.info(f'Current working directory: "{TOOLS_PATH}"')
+from qfluentwidgets import (
+    InfoBarPosition,
+    FluentIconBase,
+    StyleSheetBase,
+    MessageBoxBase,
+    SubtitleLabel,
+    DotInfoBadge,
+    PushButton,
+    BodyLabel,
+    InfoBar,
+    Theme,
+    qconfig,
+    setFont,
+    getIconColor,
+)
 
 
 class ScsHubIcon(FluentIconBase, Enum):
 
-    PIX_CONVERTER = "interface/pix_converter"
-    PIX_CONVERTER_FILL = "interface/pix_converter_fill"
-    SCS_EXTRACTOR = "interface/scs_extractor"
-    SCS_EXTRACTOR_FILL = "interface/scs_extractor_fill"
+    LOGO = "logo"
 
     SCS = "scs"
 
-    FILE = "file"
-    FOLDER = "folder"
-    ANIM = "anim"
-    MODEL = "model"
-    PREFAB = "prefab"
-    TEXT = "text"
-    TEXTURE = "texture"
-    TOBJ = "tobj"
+    PIX_I = "interface/pix"
+    PIX_FILL = "interface/pix_fill"
+    SCS_I = "interface/scs"
+    SCS_FILL = "interface/scs_fill"
+    SXC_I = "interface/sxc"
+    SXC_FILL = "interface/sxc_fill"
+    TOBJ_I = "interface/tobj"
+    TOBJ_FILL = "interface/tobj_fill"
+    DEF_I = "interface/def"
+    DEF_FILL = "interface/def_fill"
+
+    FILE = "file/file"
+    FOLDER = "file/folder"
+    ANIM = "file/anim"
+    MODEL = "file/model"
+    PREFAB = "file/prefab"
+    TEXT = "file/text"
+    TEXTURE = "file/texture"
+    TOBJ = "file/tobj"
 
     def path(self, theme=Theme.AUTO):
-        return f":/SCSHub/icon/{self.value}_{getIconColor(theme)}.svg"
+        return f":/vector/{self.value}_{getIconColor(theme)}.svg"
 
 
-class StyleSheet(StyleSheetBase, Enum):
-    """Style sheet"""
+class ScsHubDialog(MessageBoxBase):
+
+    def __init__(self, title, contet, parent=None):
+        super().__init__(parent)
+
+        self.titleLabel = SubtitleLabel(title, self)
+
+        self.text = BodyLabel(self)
+        self.text.setText(contet)
+        setFont(self.text, 16)
+
+        self.viewLayout.addWidget(self.titleLabel)
+        self.viewLayout.addSpacing(12)
+        self.viewLayout.addWidget(self.text)
+
+        self.widget.setMinimumWidth(350)
+
+
+class ScsHubStyleSheet(StyleSheetBase, Enum):
 
     LINK_CARD = "link_card"
-    SAMPLE_CARD = "sample_card"
-    HOME_INTERFACE = "home_interface"
-    SETTING_INTERFACE = "setting_interface"
+    INTERFACE_CARD = "interface_card"
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme
-        return f":/SCSHub/style/{theme.value.lower()}/{self.value}.qss"
+        return f":/style/{theme.value.lower()}/{self.value}.qss"
 
 
 class Downloader(QThread):
-    """Download File from URL and saves it to PATH"""
 
-    URL = ""
-    PATH = ""
     result = pyqtSignal(int)
+
+    def __init__(
+        self, logger: logging.Logger, url: str, save_path: str, unzip_path: str = "", parent=None
+    ):
+        super().__init__(parent)
+
+        self.logger = logger
+        self.url = url
+        self.save_path = save_path
+        self.unzip_path = unzip_path
 
     def run(self):
 
-        logger.info("Downloading ...")
-
         try:
-            result = requests.get(self.URL)
-            with open(self.PATH, "wb") as f:
+            self.logger.info(f"Starting download")
+
+            # download from url
+            result = requests.get(self.url)
+
+            # save file to save_path
+            with open(self.save_path, "wb") as f:
                 f.write(result.content)
 
             # make it executable on linux
@@ -104,24 +115,159 @@ class Downloader(QThread):
 
                 from stat import S_IEXEC, S_IXGRP
 
-                st = os.stat(self.PATH)
-                os.chmod(self.PATH, st.st_mode | S_IEXEC | S_IXGRP)
+                st = os.stat(self.save_path)
+                os.chmod(self.save_path, st.st_mode | S_IEXEC | S_IXGRP)
+
+            # unzip downloaded file
+            if self.unzip_path != "":
+                with zipfile.ZipFile(self.save_path, "r") as zip_ref:
+                    zip_ref.extractall(self.unzip_path)
+
+                scshub_file_remover(self.save_path)
 
             self.result.emit(0)
+
+            self.logger.info(f"Downloaded finished successfully")
 
         except Exception:
             self.result.emit(1)
 
-            logger.error("Unexpected error accured during downloading")
-
-
-downloader = Downloader()
+            self.logger.info("Error accured during download")
 
 
 class SignalBus(QObject):
 
-    micaEnableChanged = pyqtSignal(bool)
-    switchToInterface = pyqtSignal(str)
+    mica_enabled = pyqtSignal(bool)
+    colorize = pyqtSignal(bool)
+    switch_interface = pyqtSignal(str)
+    window_width = pyqtSignal(int)
+
+    pix_exist = pyqtSignal(bool)
+    sxc_exist = pyqtSignal(bool)
+    scs_exist = pyqtSignal(bool)
 
 
-signalBus = SignalBus()
+signal_bus = SignalBus()
+
+
+def scshub_dir_remover(dir: str):
+
+    if os.path.isdir(dir):
+        shutil.rmtree(dir)
+
+
+def scshub_file_remover(file: str):
+
+    if os.path.isfile(file):
+        os.remove(file)
+
+
+def scshub_infobar(parent, type: str, msg: str, open: str = ""):
+
+    match type:
+
+        case "success":
+            InfoBar.success(
+                title=parent.tr("Success"),
+                content=msg,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+
+        case "success_btn":
+            success = InfoBar.success(
+                title=parent.tr("Success"),
+                content=msg,
+                orient=Qt.Vertical,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+            if platform == "win32":
+                button = PushButton("Open Folder")
+                button.clicked.connect(lambda: Popen(f"explorer.exe {open}"))
+                success.addWidget(button)
+
+        case "error":
+            InfoBar.error(
+                title=parent.tr("Error"),
+                content=msg,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+
+        case "error_btn":
+            error = InfoBar.error(
+                title=parent.tr("Error"),
+                content=msg,
+                orient=Qt.Vertical,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+            if platform == "win32":
+                button = PushButton("Open Log")
+                button.clicked.connect(lambda: Popen(f"explorer.exe {open}"))
+                error.addWidget(button)
+
+        case "warn":
+            InfoBar.warning(
+                title=parent.tr("Warning"),
+                content=msg,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+
+        case "warn_btn":
+            warn = InfoBar.warning(
+                title=parent.tr("Warning"),
+                content=msg,
+                orient=Qt.Vertical,
+                isClosable=True,
+                duration=1500,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+            if platform == "win32":
+                button = PushButton("Open Folder")
+                button.clicked.connect(lambda: Popen(f"explorer.exe {open}"))
+                warn.addWidget(button)
+
+        case "info":
+            InfoBar.info(
+                title=parent.tr("Info"),
+                content=msg,
+                orient=Qt.Horizontal,
+                isClosable=True,
+                duration=2000,
+                position=InfoBarPosition.TOP_RIGHT,
+                parent=parent,
+            )
+
+
+def scshub_badge(parent, target):
+
+    badge = DotInfoBadge.success(parent, target)
+    badge.setFixedSize(6, 6)
+    badge.show()
+
+    return badge
+
+
+def scshub_log(file, data):
+
+    with open(file, "at", encoding="utf-8") as f:
+        f.write("=====  Start  =====\n")
+        f.writelines(line + "\n" for line in data)
+        f.write("=====   End   =====\n\n")
